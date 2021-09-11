@@ -1,0 +1,14 @@
+{
+    "K64F": {
+        "inherits": ["Target"],
+        "core": "Cortex-M4",
+        "extra_labels": ["Freescale", "K64F"],
+        "OUTPUT_EXT": "bin",
+        "is_disk_virtual": true,
+        "supported_toolchains": ["GCC_ARM", "ARM"],
+        "post_binary_hook": {
+            "toolchains": ["GCC_ARM"]
+        },
+        "device_name": "MK64FN1M0VLL12"
+    }
+}

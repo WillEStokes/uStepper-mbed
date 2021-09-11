@@ -1,0 +1,8 @@
+C:/Users/menwst/Documents/CPP/uStepper-mbed/build/CMakeFiles/uStepper.dir
+C:/Users/menwst/Documents/CPP/uStepper-mbed/build/CMakeFiles/edit_cache.dir
+C:/Users/menwst/Documents/CPP/uStepper-mbed/build/CMakeFiles/flash-uStepper.dir
+C:/Users/menwst/Documents/CPP/uStepper-mbed/build/CMakeFiles/rebuild_cache.dir
+C:/Users/menwst/Documents/CPP/uStepper-mbed/build/mbed-cmake/mbed-src/CMakeFiles/mbed-linker-script.dir
+C:/Users/menwst/Documents/CPP/uStepper-mbed/build/mbed-cmake/mbed-src/CMakeFiles/rebuild_cache.dir
+C:/Users/menwst/Documents/CPP/uStepper-mbed/build/mbed-cmake/mbed-src/CMakeFiles/mbed-os-static.dir
+C:/Users/menwst/Documents/CPP/uStepper-mbed/build/mbed-cmake/mbed-src/CMakeFiles/edit_cache.dir
