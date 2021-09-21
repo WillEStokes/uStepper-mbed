@@ -60,17 +60,21 @@ void Stepper::getStatus(const SetMotorSelect* data) {
         case AXIS_X:
             _stepsPerformed = AxisX.getStepsPerformed();
             _stepPeriod = AxisX.getStepPeriod();
+            _axisState = AxisX.getAxisState();
             break;
         case AXIS_Y:
             _stepsPerformed = AxisY.getStepsPerformed();
             _stepPeriod = AxisY.getStepPeriod();
+            _axisState = AxisY.getAxisState();
             break;
         case AXIS_Z:
             _stepsPerformed = AxisZ.getStepsPerformed();
             _stepPeriod = AxisZ.getStepPeriod();
+            _axisState = AxisZ.getAxisState();
             break;
     }
     
+    status.axisState = _axisState;
     status.boardState = _boardState;
     status.home = _home.read();
     status.port = _port.read();
@@ -157,22 +161,22 @@ void Stepper::stopStepper(SetMotorSelect* data) {
     switch (data->motorSelect.axis) {
         case AXIS_X:
             AxisX.stopMotor();
-            _stepsPerformed = AxisX.getStepsPerformed();
             setStepperDirection(data, 0);
             break;
         case AXIS_Y:
             AxisY.stopMotor();
-            _stepsPerformed = AxisY.getStepsPerformed();
             setStepperDirection(data, 0);
             break;
         case AXIS_Z:
             AxisZ.stopMotor();
-            _stepsPerformed = AxisZ.getStepsPerformed();
             setStepperDirection(data, 0);
             break;
     }
     
-    setBoardState(IDLE);
+    if (AxisX.getAxisState() == 0 && AxisY.getAxisState() == 0 && AxisZ.getAxisState() == 0) {
+        setBoardState(IDLE);
+    }
+
     _stepsPerformed = 0;
     comReturn(data, MSG_OK);
 }
@@ -199,7 +203,10 @@ void Stepper::returnToHome(SetMotorSelect* data) {
         return;
     }
     
-    if (_home.read() == 1) {
+    if (!(_home.read() == 0 && _port.read() == 0)) {
+        _setMotorSelect = data;
+        setStepperDirection(_setMotorSelect, 1);
+        
         switch (data->motorSelect.axis) {
         case AXIS_X:
             _flowConfigured = AxisX.runMotor();
@@ -213,15 +220,15 @@ void Stepper::returnToHome(SetMotorSelect* data) {
         }
     
         if (!_flowConfigured) {
+            setStepperDirection(_setMotorSelect, 0);
             comReturn(data, MSG_ERROR_FLOW_NOT_CONFIGURED);
             return;
         }
         
-        _setMotorSelect = data;
         setBoardState(PUMP_RUNNING);
         _flag = HOME;
         
-        _positionSignal = _home.read();
+        _positionSignal = 1;
         _tickerStepper.attach(callback(this, &Stepper::detectFallingEdge), 100ms);
     }
     
@@ -269,6 +276,7 @@ void Stepper::runToPrevious(SetMotorSelect* data) {
         return;
     }
     
+    _setMotorSelect = data;
     setStepperDirection(_setMotorSelect, 1);
     
     switch (data->motorSelect.axis) {
@@ -289,7 +297,6 @@ void Stepper::runToPrevious(SetMotorSelect* data) {
         return;
     }
     
-    _setMotorSelect = data;
     setBoardState(PUMP_RUNNING);
     _flag = PORT;
     
@@ -304,9 +311,8 @@ void Stepper::detectFallingEdge() {
 
     switch (_flag) {
         case HOME:
-            if (_positionSignal == 1 && _home.read() < 1) {
+            if (_home.read() < 1 && _port.read() < 1) {
                 edgeDetected = true; }
-            _positionSignal = _home.read();
             break;
         case PORT:
             if (_positionSignal == 1 && _port.read() < 1) {
